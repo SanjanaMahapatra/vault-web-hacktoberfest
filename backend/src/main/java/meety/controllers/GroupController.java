@@ -50,14 +50,10 @@ public class GroupController {
     }
 
     @PostMapping("/{id}/join")
-    public ResponseEntity<?> joinGroup(@PathVariable Long id) {
-        try {
-            User currentUser = authService.getCurrentUser();
-            Group updatedGroup = groupService.joinGroup(id, currentUser);
-            return ResponseEntity.ok(updatedGroup);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Group> joinGroup(@PathVariable Long id) {
+        User currentUser = authService.getCurrentUser();
+        Group updatedGroup = groupService.joinGroup(id, currentUser);
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @AdminOnly

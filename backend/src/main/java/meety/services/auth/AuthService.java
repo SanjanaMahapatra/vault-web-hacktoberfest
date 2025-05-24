@@ -1,5 +1,6 @@
 package meety.services.auth;
 
+import meety.exceptions.UserNotFoundException;
 import meety.models.User;
 import meety.repositories.UserRepository;
 import meety.security.JwtUtil;
@@ -88,7 +89,7 @@ public class AuthService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userDetails.getUsername()));
 
         return jwtUtil.generateToken(user);
     }

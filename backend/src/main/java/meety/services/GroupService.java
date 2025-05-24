@@ -1,6 +1,10 @@
 package meety.services;
 
 import meety.dtos.GroupDto;
+import meety.exceptions.GroupNotFoundException;
+import meety.exceptions.LastAdminException;
+import meety.exceptions.NotMemberException;
+import meety.exceptions.UserNotFoundException;
 import meety.models.Group;
 import meety.models.GroupMember;
 import meety.models.User;
@@ -49,7 +53,7 @@ public class GroupService {
             existing.setDescription(updatedGroup.getDescription());
             existing.setIsPublic(updatedGroup.getIsPublic());
             return groupRepository.save(existing);
-        }).orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
+        }).orElseThrow(() -> new GroupNotFoundException("Group not found with id: " + id));
     }
 
     public void deleteGroup(Long id) {
@@ -58,22 +62,20 @@ public class GroupService {
 
     public Group joinGroup(Long groupId, User currentUser) {
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new GroupNotFoundException("Group not found with id: " + groupId));
 
         boolean alreadyMember = groupMemberRepository.findByGroupAndUser(group, currentUser).isPresent();
         if (alreadyMember) {
             throw new RuntimeException("User is already a member");
         }
 
-        GroupMember newMember = new GroupMember(group, currentUser, Role.USER);
-        groupMemberRepository.save(newMember);
-
+        groupMemberRepository.save(new GroupMember(group, currentUser, Role.USER));
         return group;
     }
 
     public Group leaveGroup(Long groupId, User currentUser) {
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new GroupNotFoundException("Group not found with id: " + groupId));
 
         GroupMember member = groupMemberRepository.findByGroupAndUser(group, currentUser)
                 .orElseThrow(() -> new RuntimeException("You are not a member of this group"));
@@ -92,14 +94,24 @@ public class GroupService {
                 .toList();
     }
 
-
     public Group removeMember(Long groupId, Long userId) {
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new GroupNotFoundException("Group not found with id: " + groupId));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        groupMemberRepository.deleteByGroupAndUser(group, user);
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+        GroupMember memberToRemove = groupMemberRepository.findByGroupAndUser(group, user)
+                .orElseThrow(() -> new NotMemberException(groupId, userId));
+
+        if (memberToRemove.getRole() == Role.ADMIN) {
+            long adminCount = groupMemberRepository.countByGroupAndRole(group, Role.ADMIN);
+            if (adminCount <= 1) {
+                throw new LastAdminException(groupId);
+            }
+        }
+
+        groupMemberRepository.delete(memberToRemove);
         return group;
     }
 

@@ -1,5 +1,6 @@
 package meety.services;
 
+import meety.exceptions.UserNotFoundException;
 import meety.models.User;
 import meety.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class UserService {
      * Used internally to fetch full user details for login or other user-related operations.
      */
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
     }
 }

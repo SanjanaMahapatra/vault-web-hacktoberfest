@@ -52,12 +52,8 @@ public class UserController {
                     """
     )
     public ResponseEntity<?> login(@RequestBody UserDto user) {
-        try {
-            String token = authService.login(user.getUsername(), user.getPassword());
-            return ResponseEntity.ok(token);
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
+        String token = authService.login(user.getUsername(), user.getPassword());
+        return ResponseEntity.ok(token);
     }
 
 }
