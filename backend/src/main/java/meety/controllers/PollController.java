@@ -3,7 +3,7 @@ package meety.controllers;
 import jakarta.validation.Valid;
 import meety.dtos.PollRequestDto;
 import meety.dtos.PollResponseDto;
-import meety.exceptions.GroupNotFoundException;
+import meety.exceptions.notfound.GroupNotFoundException;
 import meety.models.Group;
 import meety.models.Poll;
 import meety.models.User;
@@ -61,5 +61,24 @@ public class PollController {
         pollService.vote(groupId, pollId, optionId, currentUser);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{pollId}")
+    public ResponseEntity<PollResponseDto> updatePoll(
+            @PathVariable Long groupId,
+            @PathVariable Long pollId,
+            @RequestBody @Valid PollRequestDto pollDto) {
+        User currentUser = authService.getCurrentUser();
+        Poll updatedPoll = pollService.updatePoll(groupId, pollId, currentUser, pollDto);
+        return ResponseEntity.ok(pollService.toResponseDto(updatedPoll));
+    }
+
+    @DeleteMapping("/{pollId}")
+    public ResponseEntity<Void> deletePoll(
+            @PathVariable Long groupId,
+            @PathVariable Long pollId) {
+        User currentUser = authService.getCurrentUser();
+        pollService.deletePoll(groupId, pollId, currentUser);
+        return ResponseEntity.noContent().build();
     }
 }

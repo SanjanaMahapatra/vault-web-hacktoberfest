@@ -2,8 +2,10 @@ package meety.services;
 
 import meety.dtos.PollRequestDto;
 import meety.dtos.PollResponseDto;
-import meety.exceptions.GroupNotFoundException;
-import meety.exceptions.NotMemberException;
+import meety.exceptions.UnauthorizedException;
+import meety.exceptions.notfound.GroupNotFoundException;
+import meety.exceptions.notfound.NotMemberException;
+import meety.exceptions.notfound.PollNotFoundException;
 import meety.models.*;
 import meety.repositories.GroupMemberRepository;
 import meety.repositories.GroupRepository;
@@ -12,6 +14,7 @@ import meety.repositories.PollVoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,7 +106,7 @@ public class PollService {
         }
 
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new RuntimeException("Poll not found"));
+                .orElseThrow(() -> new PollNotFoundException(pollId));
 
         if (!poll.getGroup().getId().equals(groupId)) {
             throw new RuntimeException("Poll does not belong to group");
@@ -114,11 +117,7 @@ public class PollService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("PollOption not found in poll"));
 
-        boolean alreadyVoted = poll.getOptions().stream()
-                .flatMap(o -> o.getVotes().stream())
-                .anyMatch(vote -> vote.getUser().getId().equals(user.getId()));
-
-        if (alreadyVoted) {
+        if (pollVoteRepository.existsByOption_PollAndUser(poll, user)) {
             throw new RuntimeException("User has already voted in this poll");
         }
 
@@ -127,9 +126,57 @@ public class PollService {
                 .user(user)
                 .build();
 
+        if (option.getVotes() == null) {
+            option.setVotes(new ArrayList<>());
+        }
         option.getVotes().add(vote);
 
         pollVoteRepository.save(vote);
     }
 
+    public Poll updatePoll(Long groupId, Long pollId, User user, PollRequestDto pollDto) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new PollNotFoundException(pollId));
+
+        if (!poll.getGroup().getId().equals(groupId)) {
+            throw new RuntimeException("Poll does not belong to group");
+        }
+
+        if (!poll.getAuthor().getId().equals(user.getId())) {
+            throw new UnauthorizedException("Only the author can edit the poll");
+        }
+
+        poll.setQuestion(pollDto.getQuestion());
+        poll.setDeadline(pollDto.getDeadline());
+        poll.setAnonymous(pollDto.isAnonymous());
+
+        poll.getOptions().clear();
+
+        List<PollOption> newOptions = pollDto.getOptions().stream()
+                .map(optionText -> PollOption.builder()
+                        .poll(poll)
+                        .text(optionText)
+                        .build())
+                .toList();
+
+        poll.getOptions().addAll(newOptions);
+
+        return pollRepository.save(poll);
+    }
+
+
+    public void deletePoll(Long groupId, Long pollId, User user) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new PollNotFoundException(pollId));
+
+        if (!poll.getGroup().getId().equals(groupId)) {
+            throw new RuntimeException("Poll does not belong to group");
+        }
+
+        if (!poll.getAuthor().getId().equals(user.getId())) {
+            throw new UnauthorizedException("Only the author can delete the poll");
+        }
+
+        pollRepository.delete(poll);
+    }
 }

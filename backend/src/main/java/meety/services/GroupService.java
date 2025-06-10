@@ -1,7 +1,11 @@
 package meety.services;
 
 import meety.dtos.GroupDto;
-import meety.exceptions.*;
+import meety.exceptions.AlreadyMemberException;
+import meety.exceptions.LastAdminException;
+import meety.exceptions.notfound.GroupNotFoundException;
+import meety.exceptions.notfound.NotMemberException;
+import meety.exceptions.notfound.UserNotFoundException;
 import meety.models.Group;
 import meety.models.GroupMember;
 import meety.models.User;

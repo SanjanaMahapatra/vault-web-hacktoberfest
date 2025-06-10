@@ -1,6 +1,6 @@
 package meety.services;
 
-import meety.exceptions.UserNotFoundException;
+import meety.exceptions.notfound.UserNotFoundException;
 import meety.models.User;
 import meety.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

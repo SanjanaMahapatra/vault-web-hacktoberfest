@@ -1,5 +1,8 @@
 package meety.exceptions;
 
+import meety.exceptions.notfound.GroupNotFoundException;
+import meety.exceptions.notfound.NotMemberException;
+import meety.exceptions.notfound.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

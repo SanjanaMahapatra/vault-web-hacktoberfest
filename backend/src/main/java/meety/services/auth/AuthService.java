@@ -1,6 +1,6 @@
 package meety.services.auth;
 
-import meety.exceptions.UserNotFoundException;
+import meety.exceptions.notfound.UserNotFoundException;
 import meety.models.User;
 import meety.repositories.UserRepository;
 import meety.security.JwtUtil;
