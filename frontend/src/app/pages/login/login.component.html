@@ -1,0 +1,56 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    class="w-full max-w-md p-6 bg-white rounded shadow"
+  >
+    <div>
+      <label for="username" class="block font-semibold mb-1">Username</label>
+      <input
+        id="username"
+        formControlName="username"
+        type="text"
+        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-1"
+        [ngClass]="{
+          'border-red-500': submitted && loginForm.get('username')?.errors,
+        }"
+      />
+      <div
+        *ngIf="submitted && loginForm.get('username')?.errors"
+        class="text-red-500 text-sm"
+      >
+        Username is required.
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <label for="password" class="block font-semibold mb-1">Password</label>
+      <input
+        id="password"
+        formControlName="password"
+        type="password"
+        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-1"
+        [ngClass]="{
+          'border-red-500': submitted && loginForm.get('password')?.errors,
+        }"
+      />
+      <div
+        *ngIf="submitted && loginForm.get('password')?.errors"
+        class="text-red-500 text-sm"
+      >
+        Password is required.
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="mt-4 text-red-600 font-semibold">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      type="submit"
+      class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition"
+    >
+      Login
+    </button>
+  </form>
+</div>

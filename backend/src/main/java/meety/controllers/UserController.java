@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "User Controller", description = "Handles registration and login of users")
@@ -53,7 +55,7 @@ public class UserController {
     )
     public ResponseEntity<?> login(@RequestBody UserDto user) {
         String token = authService.login(user.getUsername(), user.getPassword());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
 }
