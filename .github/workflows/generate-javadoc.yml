@@ -1,0 +1,34 @@
+name: Generate Javadoc
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  javadoc:
+    name: Generate Javadoc
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build project & generate Javadoc
+        working-directory: ./backend
+        run: |
+          ./mvnw clean javadoc:javadoc
+          rm -rf .docs
+          mv target/site/apidocs .docs
+
+      - name: Commit and push Javadoc
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore: update Javadoc"
+          branch: main
