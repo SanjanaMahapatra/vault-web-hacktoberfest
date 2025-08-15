@@ -7,18 +7,28 @@
     - 📁 **java**
       - 📁 **meety**
         - 📄 [BackendApplication.java](backend/src/main/java/meety/BackendApplication.java)
-        - 📄 [OpenApiConfig.java](backend/src/main/java/meety/OpenApiConfig.java)
         - 📁 **config**
           - 📄 [CorsConfig.java](backend/src/main/java/meety/config/CorsConfig.java)
+          - 📄 [EncryptionConfig.java](backend/src/main/java/meety/config/EncryptionConfig.java)
+          - 📄 [OpenApiConfig.java](backend/src/main/java/meety/config/OpenApiConfig.java)
+          - 📁 **websocket**
+            - 📄 [JwtHandshakeInterceptor.java](backend/src/main/java/meety/config/websocket/JwtHandshakeInterceptor.java)
+            - 📄 [WebSocketConfig.java](backend/src/main/java/meety/config/websocket/WebSocketConfig.java)
         - 📁 **controllers**
+          - 📄 [ChatController.java](backend/src/main/java/meety/controllers/ChatController.java)
           - 📄 [GroupController.java](backend/src/main/java/meety/controllers/GroupController.java)
           - 📄 [PollController.java](backend/src/main/java/meety/controllers/PollController.java)
+          - 📄 [PrivateChatController.java](backend/src/main/java/meety/controllers/PrivateChatController.java)
           - 📄 [UserController.java](backend/src/main/java/meety/controllers/UserController.java)
         - 📁 **dtos**
+          - 📄 [ChatMessageDto.java](backend/src/main/java/meety/dtos/ChatMessageDto.java)
           - 📄 [GroupDto.java](backend/src/main/java/meety/dtos/GroupDto.java)
           - 📄 [PollRequestDto.java](backend/src/main/java/meety/dtos/PollRequestDto.java)
           - 📄 [PollResponseDto.java](backend/src/main/java/meety/dtos/PollResponseDto.java)
-          - 📄 [UserDto.java](backend/src/main/java/meety/dtos/UserDto.java)
+          - 📄 [PrivateChatDto.java](backend/src/main/java/meety/dtos/PrivateChatDto.java)
+          - 📁 **user**
+            - 📄 [UserDto.java](backend/src/main/java/meety/dtos/user/UserDto.java)
+            - 📄 [UserResponseDto.java](backend/src/main/java/meety/dtos/user/UserResponseDto.java)
         - 📁 **exceptions**
           - 📄 [AdminAccessDeniedException.java](backend/src/main/java/meety/exceptions/AdminAccessDeniedException.java)
           - 📄 [AlreadyMemberException.java](backend/src/main/java/meety/exceptions/AlreadyMemberException.java)
@@ -32,21 +42,26 @@
             - 📄 [PollNotFoundException.java](backend/src/main/java/meety/exceptions/notfound/PollNotFoundException.java)
             - 📄 [UserNotFoundException.java](backend/src/main/java/meety/exceptions/notfound/UserNotFoundException.java)
         - 📁 **models**
+          - 📄 [ChatMessage.java](backend/src/main/java/meety/models/ChatMessage.java)
           - 📄 [Group.java](backend/src/main/java/meety/models/Group.java)
           - 📄 [GroupMember.java](backend/src/main/java/meety/models/GroupMember.java)
           - 📄 [Poll.java](backend/src/main/java/meety/models/Poll.java)
           - 📄 [PollOption.java](backend/src/main/java/meety/models/PollOption.java)
           - 📄 [PollVote.java](backend/src/main/java/meety/models/PollVote.java)
+          - 📄 [PrivateChat.java](backend/src/main/java/meety/models/PrivateChat.java)
           - 📄 [User.java](backend/src/main/java/meety/models/User.java)
           - 📁 **enums**
             - 📄 [Role.java](backend/src/main/java/meety/models/enums/Role.java)
         - 📁 **repositories**
+          - 📄 [ChatMessageRepository.java](backend/src/main/java/meety/repositories/ChatMessageRepository.java)
           - 📄 [GroupMemberRepository.java](backend/src/main/java/meety/repositories/GroupMemberRepository.java)
           - 📄 [GroupRepository.java](backend/src/main/java/meety/repositories/GroupRepository.java)
           - 📄 [PollRepository.java](backend/src/main/java/meety/repositories/PollRepository.java)
           - 📄 [PollVoteRepository.java](backend/src/main/java/meety/repositories/PollVoteRepository.java)
+          - 📄 [PrivateChatRepository.java](backend/src/main/java/meety/repositories/PrivateChatRepository.java)
           - 📄 [UserRepository.java](backend/src/main/java/meety/repositories/UserRepository.java)
         - 📁 **security**
+          - 📄 [EncryptionUtil.java](backend/src/main/java/meety/security/EncryptionUtil.java)
           - 📄 [JwtAuthFilter.java](backend/src/main/java/meety/security/JwtAuthFilter.java)
           - 📄 [JwtUtil.java](backend/src/main/java/meety/security/JwtUtil.java)
           - 📄 [SecurityConfig.java](backend/src/main/java/meety/security/SecurityConfig.java)
@@ -55,8 +70,10 @@
           - 📁 **aspects**
             - 📄 [AdminOnlyAspect.java](backend/src/main/java/meety/security/aspects/AdminOnlyAspect.java)
         - 📁 **services**
+          - 📄 [ChatService.java](backend/src/main/java/meety/services/ChatService.java)
           - 📄 [GroupService.java](backend/src/main/java/meety/services/GroupService.java)
           - 📄 [PollService.java](backend/src/main/java/meety/services/PollService.java)
+          - 📄 [PrivateChatService.java](backend/src/main/java/meety/services/PrivateChatService.java)
           - 📄 [UserService.java](backend/src/main/java/meety/services/UserService.java)
           - 📁 **auth**
             - 📄 [AuthService.java](backend/src/main/java/meety/services/auth/AuthService.java)
@@ -76,6 +93,18 @@
     - 📄 [app.config.ts](frontend/src/app/app.config.ts)
     - 📄 [app.routes.ts](frontend/src/app/app.routes.ts)
     - 📄 [auth.guard.ts](frontend/src/app/auth.guard.ts)
+    - 📁 **core**
+      - 📁 **interceptors**
+        - 📄 [token.interceptor.ts](frontend/src/app/core/interceptors/token.interceptor.ts)
+    - 📁 **models**
+      - 📁 **dtos**
+        - 📄 [ChatMessageDto.ts](frontend/src/app/models/dtos/ChatMessageDto.ts)
+        - 📄 [PrivateChatDto.ts](frontend/src/app/models/dtos/PrivateChatDto.ts)
+        - 📄 [UserDto.ts](frontend/src/app/models/dtos/UserDto.ts)
+    - 📁 **navbar**
+      - 📄 [navbar.component.html](frontend/src/app/navbar/navbar.component.html)
+      - 📄 [navbar.component.scss](frontend/src/app/navbar/navbar.component.scss)
+      - 📄 [navbar.component.ts](frontend/src/app/navbar/navbar.component.ts)
     - 📁 **pages**
       - 📁 **home**
         - 📄 [home.component.html](frontend/src/app/pages/home/home.component.html)
@@ -85,14 +114,22 @@
         - 📄 [login.component.html](frontend/src/app/pages/login/login.component.html)
         - 📄 [login.component.scss](frontend/src/app/pages/login/login.component.scss)
         - 📄 [login.component.ts](frontend/src/app/pages/login/login.component.ts)
+      - 📁 **private-chat-dialog**
+        - 📄 [private-chat-dialog.component.html](frontend/src/app/pages/private-chat-dialog/private-chat-dialog.component.html)
+        - 📄 [private-chat-dialog.component.scss](frontend/src/app/pages/private-chat-dialog/private-chat-dialog.component.scss)
+        - 📄 [private-chat-dialog.component.ts](frontend/src/app/pages/private-chat-dialog/private-chat-dialog.component.ts)
       - 📁 **register**
         - 📄 [register.component.html](frontend/src/app/pages/register/register.component.html)
         - 📄 [register.component.scss](frontend/src/app/pages/register/register.component.scss)
         - 📄 [register.component.ts](frontend/src/app/pages/register/register.component.ts)
     - 📁 **services**
       - 📄 [auth.service.ts](frontend/src/app/services/auth.service.ts)
+      - 📄 [private-chat.service.ts](frontend/src/app/services/private-chat.service.ts)
+      - 📄 [user.service.ts](frontend/src/app/services/user.service.ts)
+      - 📄 [web-socket.service.ts](frontend/src/app/services/web-socket.service.ts)
   - 📁 **environments**
-    - 📄 [environment.test.ts](frontend/src/environments/environment.test.ts)
+    - 📄 [environment.ts](frontend/src/environments/environment.ts)
   - 📄 [index.html](frontend/src/index.html)
   - 📄 [main.ts](frontend/src/main.ts)
+  - 📄 [polyfills.ts](frontend/src/polyfills.ts)
   - 📄 [styles.scss](frontend/src/styles.scss)
