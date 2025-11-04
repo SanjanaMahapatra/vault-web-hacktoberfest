@@ -19,6 +19,7 @@ import vaultWeb.repositories.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing groups, including creating, updating,
@@ -40,7 +41,7 @@ public class GroupService {
      */
     public List<Group> getPublicGroups() {
         List<Group> allGroups = groupRepository.findAll();
-        return allGroups.stream().filter(Group::getIsPublic).toList();
+        return allGroups.stream().filter(Group::getIsPublic).collect(Collectors.toList());
     }
 
     /**
@@ -151,7 +152,7 @@ public class GroupService {
         List<GroupMember> groupMembers = groupMemberRepository.findAllByGroup(group);
         return groupMembers.stream()
                 .map(GroupMember::getUser)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

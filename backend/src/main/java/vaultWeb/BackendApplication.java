@@ -1,6 +1,7 @@
 package vaultWeb;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @EnableAspectJAutoProxy
 @SpringBootApplication
+@EnableAutoConfiguration
 public class BackendApplication implements WebMvcConfigurer {
 
     /**

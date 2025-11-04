@@ -17,6 +17,7 @@ import vaultWeb.services.PollService;
 import vaultWeb.services.auth.AuthService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for managing polls within a specific group.
@@ -64,7 +65,7 @@ public class PollController {
         List<PollResponseDto> polls = pollService.getPollsByGroup(groupId, currentUser)
                 .stream()
                 .map(pollService::toResponseDto)
-                .toList();
+                .collect(Collectors.toList());
         return ResponseEntity.ok(polls);
     }
 

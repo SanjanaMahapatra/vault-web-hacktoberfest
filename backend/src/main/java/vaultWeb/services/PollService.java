@@ -218,7 +218,7 @@ public class PollService {
                         .poll(poll)
                         .text(optionText)
                         .build())
-                .toList();
+                .collect(Collectors.toList());
 
         poll.getOptions().addAll(newOptions);
 

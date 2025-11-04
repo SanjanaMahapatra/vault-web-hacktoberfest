@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import vaultWeb.dtos.user.UserDto;
+import vaultWeb.dtos.user.UserResponseDto;
+import vaultWeb.exceptions.DuplicateEmailException;
 import vaultWeb.exceptions.DuplicateUsernameException;
+import vaultWeb.exceptions.notfound.UserNotFoundException;
 import vaultWeb.models.User;
 import vaultWeb.repositories.UserRepository;
 
@@ -64,5 +68,54 @@ public class UserService {
      */
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    /**
+     * Checks if a email already exists in the database.
+     *
+     * @param email The email to check.
+     * @return {@code true} if the email exists, {@code false} otherwise.
+     */
+    public boolean userEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+
+    /**
+     * This method updates the user profile in the database
+     *
+     * @param userDto Takes UserDto as a param.
+     * @param username Takes username as a param
+     * @return {@code UserResponseDto} with the updated user profile details
+     * @throws DuplicateEmailException if a user with the same email already exists.
+     */
+    public UserResponseDto updateUserProfile(UserDto userDto, String username) {
+        User user = userRepository.findByUsername(username).
+                orElseThrow(() -> new UserNotFoundException("User not found with given username"));
+
+        // checking if the email id already exists
+
+        if(userDto.getEmail() != null &&
+            !userDto.getEmail().equalsIgnoreCase(user.getEmail()) &&
+                userRepository.existsByEmail(userDto.getEmail())
+        ) {
+            throw new DuplicateEmailException("Email Address already exists with other user id");
+        }
+
+        // setting of the optional fields i.e phone, email and profile picture
+        if( user.getPhoneNumber() != null) {
+            user.setPhoneNumber(userDto.getPhoneNumber());
+        }
+
+        if(user.getEmail() != null) {
+            user.setEmail(userDto.getEmail());
+        }
+
+        if(user.getProfilePicture() != null) {
+            user.setProfilePicture(userDto.getProfilePicture());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return new UserResponseDto(updatedUser);
     }
 }

@@ -10,8 +10,14 @@ import vaultWeb.models.User;
 @NoArgsConstructor
 public class UserResponseDto {
     private String username;
+    private String phoneNumber;
+    private String email;
+    private String profilePicture;
 
     public UserResponseDto(User user) {
         this.username = user.getUsername();
+        this.profilePicture = "profile-picture";
+        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
     }
 }

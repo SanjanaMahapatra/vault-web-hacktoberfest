@@ -2,6 +2,7 @@ package vaultWeb.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import vaultWeb.services.auth.AuthService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -76,7 +78,33 @@ public class UserController {
         List<UserResponseDto> users = userService.getAllUsers()
                 .stream()
                 .map(UserResponseDto::new)
-                .toList();
+                .collect(Collectors.toList());
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/check-email")
+    @Operation(
+            summary = "Check if email already exists",
+            description = "Returns true if the email is already taken, false otherwise."
+    )
+    public ResponseEntity<Map<String, Boolean>> checkEmailExists(@RequestParam String email) {
+        boolean exists = userService.userEmailExists(email);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @PutMapping("/update-user-profile")
+    @Operation(
+            summary = "Update the user profile",
+            description = """
+                    Returns Updated UserResponseDTO with the updated profile details of user, it updates
+                    "only the optional details such as email, phone, profile photo.
+                    """
+    )
+    public ResponseEntity<UserResponseDto> updateProfileDetails(@Valid @RequestBody UserDto userDto) {
+        UserResponseDto updatedProfileDetails = new UserResponseDto();
+
+        String currentUserName = authService.getCurrentUser().getUsername();
+        updatedProfileDetails = userService.updateUserProfile(userDto, currentUserName);
+        return ResponseEntity.ok(updatedProfileDetails);
     }
 }

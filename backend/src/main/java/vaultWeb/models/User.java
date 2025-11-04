@@ -2,6 +2,7 @@ package vaultWeb.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,9 +29,18 @@ public class User {
     @JsonIgnore
     private List<GroupMember> groupMemberships;
 
+    private String phoneNumber;
+
+    @Column(unique = true)
+    private String email;
+    private String profilePicture;
+
     public User(UserDto userDto) {
         username = userDto.getUsername();
         password = userDto.getPassword();
         groupMemberships = List.of();
+        phoneNumber = userDto.getPhoneNumber();
+        email = userDto.getEmail();
+        profilePicture = userDto.getProfilePicture();
     }
 }

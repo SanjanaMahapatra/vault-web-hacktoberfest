@@ -16,6 +16,7 @@ import vaultWeb.security.EncryptionUtil;
 import vaultWeb.services.PrivateChatService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/private-chats")
@@ -74,6 +75,6 @@ public class PrivateChatController {
                         throw new RuntimeException("Decryption failed", e);
                     }
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 }
