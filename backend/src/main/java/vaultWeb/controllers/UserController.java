@@ -89,7 +89,6 @@ public class UserController {
             description = "Returns the details of the currently authenticated user."
     )
     public ResponseEntity<UserResponseDto> getCurrentUserDetails() {
-        System.out.println("current user details -> " + authService.getCurrentUser().getUsername());
         UserResponseDto currentUserDetails = userService.getUserDetailsByUsername(authService.getCurrentUser().getUsername());
         return ResponseEntity.ok(currentUserDetails);
     }
@@ -115,15 +114,11 @@ public class UserController {
     public ResponseEntity<UserResponseDto> updateProfileDetails(@RequestParam String username, @Valid @RequestBody UserRegisterDTO userDto) throws AccessDeniedException {
 
         String currentUserName = authService.getCurrentUser().getUsername();
-        System.out.println("current username : " + currentUserName);
-        System.out.println("requested username : " + username);
         if(!currentUserName.equalsIgnoreCase(username)) {
             throw new AccessDeniedException("You are not allowed to update other user's profile");
         }
 
-        System.out.println("coming here to update profile");
         UserResponseDto updatedProfileDetails = userService.updateUserProfile(userDto, currentUserName);
-        System.out.println("Profile updated successfully");
 
         return ResponseEntity.ok(updatedProfileDetails);
     }
