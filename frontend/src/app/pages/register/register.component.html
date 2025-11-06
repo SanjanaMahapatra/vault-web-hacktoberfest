@@ -67,6 +67,31 @@
           : "Confirmation is required."
       }}
     </div>
+
+    <!-- Email -->
+    <label for="email" class="block font-semibold mb-1">Email</label>
+    <input
+      id="email"
+      formControlName="email"
+      type="email"
+      class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-1"
+    />
+
+    <!-- Phone Number -->
+     <!-- note - provide the phone number validation -->
+    <label for="phoneNumber" class="block font-semibold mb-1">Phone Number</label>
+    <input
+      id="phoneNumber"
+      formControlName="phoneNumber"
+      type="text"
+      class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-1"
+      [ngClass]="{ 'border-red-500': submitted && f['phoneNumber'].errors }"
+    />
+    <div *ngIf="f['phoneNumber'].errors?.['pattern']" class="text-red-500 text-sm">
+      Invalid Phone Number Format! Phone Number must be 10 digits.
+    </div>
+    />
+
     <div *ngIf="errorMessage" class="mt-4 text-red-600 font-semibold">
       {{ errorMessage }}
     </div>

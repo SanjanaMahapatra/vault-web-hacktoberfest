@@ -16,7 +16,7 @@ public class UserResponseDto {
 
     public UserResponseDto(User user) {
         this.username = user.getUsername();
-        this.profilePicture = "profile-picture";
+        this.profilePicture = user.getProfilePicture();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
     }

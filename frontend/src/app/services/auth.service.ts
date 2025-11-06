@@ -24,36 +24,36 @@ export class AuthService {
       );
   }
 
-  register(username: string, password: string): Observable<string> {
+  register(username: string, password: string, email?: string, phoneNumber?: string, profilePicture?: string): Observable<string> {
     return this.http.post(
       `${this.apiUrl}/auth/register`,
-      { username, password },
+      { username, password, email, phoneNumber, profilePicture },
       { responseType: 'text' },
     );
   }
 
   saveToken(token: string): void {
-    localStorage.setItem('token', token);
+    sessionStorage.setItem('token', token);
   }
 
   saveUsername(username: string): void {
-    localStorage.setItem('username', username);
+    sessionStorage.setItem('username', username);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token') as string | null;
+    return sessionStorage.getItem('token') as string | null;
   }
 
   getUsername(): string | null {
-    return localStorage.getItem('username') as string | null;
+    return sessionStorage.getItem('username') as string | null;
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return !!sessionStorage.getItem('token');
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
   }
 
   checkUsernameExists(username: string): Observable<boolean> {

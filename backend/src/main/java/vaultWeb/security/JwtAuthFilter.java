@@ -16,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import vaultWeb.services.auth.MyUserDetailsService;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * JWT authentication filter that intercepts incoming HTTP requests and validates JWT tokens.
@@ -34,6 +36,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final MyUserDetailsService userDetailsService;
+
+    // Define the list of public path that should bypass the JWT authentication
+    private static final List<String> PUBLIC_PATH = Arrays.asList(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/users",
+            "/api/auth/check-username",
+            "/api/auth/check-email"
+    );
 
     /**
      * Constructs a new {@code JwtAuthFilter} with the specified {@link JwtUtil} and {@link MyUserDetailsService}.
@@ -68,7 +79,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String path = request.getServletPath();
-        if (path.startsWith("/api/auth/")) {
+
+        /**
+         *  this line of code is added to make sure that when any user profile is updated
+         *  the user must be authenticated before in their profile
+         */
+
+        boolean isPublicPath = PUBLIC_PATH.stream().anyMatch(path::startsWith);
+
+        if (isPublicPath) {
             filterChain.doFilter(request, response);
             return;
         }

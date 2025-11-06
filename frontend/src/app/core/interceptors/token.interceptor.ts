@@ -9,10 +9,10 @@ import { catchError, throwError } from 'rxjs';
  * Handles 401 Unauthorized errors by clearing stored tokens and redirecting to login.
  */
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
-  const router = inject(Router);
+  const router: Router = inject(Router);
 
   if (!req.url.includes('/login') && !req.url.includes('/register')) {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       req = req.clone({
         setHeaders: {
@@ -25,8 +25,8 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((err) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('username');
         router.navigate(['/login']);
       }
       return throwError(() => err);

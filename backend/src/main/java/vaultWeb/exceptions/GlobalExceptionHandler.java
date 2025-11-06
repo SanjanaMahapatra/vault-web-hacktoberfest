@@ -1,15 +1,21 @@
 package vaultWeb.exceptions;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import vaultWeb.exceptions.notfound.GroupNotFoundException;
 import vaultWeb.exceptions.notfound.NotMemberException;
 import vaultWeb.exceptions.notfound.UserNotFoundException;
+import vaultWeb.utility.ErrorInfo;
 
 import java.nio.file.AccessDeniedException;
+import java.util.stream.Collectors;
 
 /**
  * Global exception handler for all controllers in the "vaultWeb.controllers" package.
@@ -117,5 +123,41 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Internal error: " + ex.getMessage());
+    }
+
+    /**
+     * Handles DuplicateEmailException and returns 409 Conflict.
+     */
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<String> handleDuplicateEmail(DuplicateEmailException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body("Registration error: " + ex.getMessage());
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+    public ResponseEntity<ErrorInfo> validatorExceptionHandler(Exception exception) {
+
+        String errorMsg;
+
+        if(exception instanceof MethodArgumentNotValidException) {
+            MethodArgumentNotValidException manvException = (MethodArgumentNotValidException) exception;
+            errorMsg = manvException.getBindingResult()
+                    .getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+        }else {
+            ConstraintViolationException cvException = (ConstraintViolationException) exception;
+            errorMsg = cvException.getConstraintViolations()
+                    .stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining(", "));
+        }
+
+        ErrorInfo errorInfo = new ErrorInfo();
+        errorInfo.setErrorCode(HttpStatus.BAD_REQUEST.value());
+        errorInfo.setErrorMessage(errorMsg);
+        return new ResponseEntity<>(errorInfo, HttpStatus.BAD_REQUEST);
     }
 }

@@ -13,10 +13,4 @@ public class UserDto {
     private String username;
     private String password;
 
-    @Pattern(regexp = "^[+]?[0-9][10-15]$", message = "Invalid Phone Number Format")
-    private String phoneNumber;
-
-    @Email(message = "Invalid Email format")
-    private String email;
-    private String profilePicture;
 }

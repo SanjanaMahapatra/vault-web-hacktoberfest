@@ -1,0 +1,69 @@
+:host {
+  margin: 0 auto;
+  display: block;
+  width: 800px;
+  padding-top: 4rem;
+}
+
+.form-fields-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 6rem;
+  flex-wrap: wrap;
+}
+
+.form-fields-wrapper > .input-fields-container {
+  flex-basis: 300px;
+  min-width: 200px;
+  max-width: 300px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.form-fields-wrapper > .avatar-container {
+  max-width: 300px;
+  img {
+    width: 60%;
+  }
+}
+
+.buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-left: 6rem;
+}
+
+.buttons-container > .profile-btn {
+    background: #2b7fff;
+    color: white;
+}
+
+
+.avtar-upload-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.avatar-preview:hover {
+    border-color: #007bff;
+}
+
+.upload-btn {
+    margin-top: 8px;
+}

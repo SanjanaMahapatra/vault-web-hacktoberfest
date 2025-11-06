@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import vaultWeb.dtos.user.UserDto;
+import vaultWeb.dtos.user.UserRegisterDTO;
 
 import java.util.List;
 
@@ -29,13 +30,16 @@ public class User {
     @JsonIgnore
     private List<GroupMember> groupMemberships;
 
+    @Column(nullable = true) // adding nullable = true, since these are optional fields
     private String phoneNumber;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = true) // adding unique and nullable = true
     private String email;
+
+    @Column(nullable = true)
     private String profilePicture;
 
-    public User(UserDto userDto) {
+    public User(UserRegisterDTO userDto) {
         username = userDto.getUsername();
         password = userDto.getPassword();
         groupMemberships = List.of();

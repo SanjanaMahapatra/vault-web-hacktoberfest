@@ -4,15 +4,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vaultWeb.dtos.user.UserDto;
+import vaultWeb.dtos.user.UserRegisterDTO;
 import vaultWeb.dtos.user.UserResponseDto;
 import vaultWeb.models.User;
 import vaultWeb.services.UserService;
 import vaultWeb.services.auth.AuthService;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class UserController {
                     The password is hashed using BCrypt (via Spring Security's PasswordEncoder) before being persisted.
                     The new user is assigned the default role 'User'."""
     )
-    public ResponseEntity<String> register(@RequestBody UserDto user) {
+    public ResponseEntity<String> register(@Valid @RequestBody UserRegisterDTO user) {
         userService.registerUser(new User(user));
         return ResponseEntity.ok("User registered successfully");
     }
@@ -82,6 +83,17 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/current-user-details")
+    @Operation(
+            summary = "Get current logged-in user details",
+            description = "Returns the details of the currently authenticated user."
+    )
+    public ResponseEntity<UserResponseDto> getCurrentUserDetails() {
+        System.out.println("current user details -> " + authService.getCurrentUser().getUsername());
+        UserResponseDto currentUserDetails = userService.getUserDetailsByUsername(authService.getCurrentUser().getUsername());
+        return ResponseEntity.ok(currentUserDetails);
+    }
+
     @GetMapping("/check-email")
     @Operation(
             summary = "Check if email already exists",
@@ -100,11 +112,19 @@ public class UserController {
                     "only the optional details such as email, phone, profile photo.
                     """
     )
-    public ResponseEntity<UserResponseDto> updateProfileDetails(@Valid @RequestBody UserDto userDto) {
-        UserResponseDto updatedProfileDetails = new UserResponseDto();
+    public ResponseEntity<UserResponseDto> updateProfileDetails(@RequestParam String username, @Valid @RequestBody UserRegisterDTO userDto) throws AccessDeniedException {
 
         String currentUserName = authService.getCurrentUser().getUsername();
-        updatedProfileDetails = userService.updateUserProfile(userDto, currentUserName);
+        System.out.println("current username : " + currentUserName);
+        System.out.println("requested username : " + username);
+        if(!currentUserName.equalsIgnoreCase(username)) {
+            throw new AccessDeniedException("You are not allowed to update other user's profile");
+        }
+
+        System.out.println("coming here to update profile");
+        UserResponseDto updatedProfileDetails = userService.updateUserProfile(userDto, currentUserName);
+        System.out.println("Profile updated successfully");
+
         return ResponseEntity.ok(updatedProfileDetails);
     }
 }

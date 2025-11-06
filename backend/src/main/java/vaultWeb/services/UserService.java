@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vaultWeb.dtos.user.UserDto;
+import vaultWeb.dtos.user.UserRegisterDTO;
 import vaultWeb.dtos.user.UserResponseDto;
 import vaultWeb.exceptions.DuplicateEmailException;
 import vaultWeb.exceptions.DuplicateUsernameException;
@@ -47,6 +48,9 @@ public class UserService {
         if (usernameExists(user.getUsername())) {
             throw new DuplicateUsernameException("Username '" + user.getUsername() + "' is already taken");
         }
+        if(userEmailExists(user.getEmail())) {
+            throw new DuplicateEmailException("Email '" + user.getEmail() + "' is already registered! Use another email!");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -81,6 +85,19 @@ public class UserService {
     }
 
 
+
+    public UserResponseDto getUserDetailsByUsername(String username) {
+        if (!usernameExists(username)) {
+            throw new DuplicateUsernameException("Username '" + username + "' does not exists in database");
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with given username"));
+
+        System.out.println("user returned -> " + user.getUsername());
+        return new UserResponseDto(user);
+    }
+
     /**
      * This method updates the user profile in the database
      *
@@ -89,7 +106,7 @@ public class UserService {
      * @return {@code UserResponseDto} with the updated user profile details
      * @throws DuplicateEmailException if a user with the same email already exists.
      */
-    public UserResponseDto updateUserProfile(UserDto userDto, String username) {
+    public UserResponseDto updateUserProfile(UserRegisterDTO userDto, String username) {
         User user = userRepository.findByUsername(username).
                 orElseThrow(() -> new UserNotFoundException("User not found with given username"));
 
@@ -101,6 +118,8 @@ public class UserService {
         ) {
             throw new DuplicateEmailException("Email Address already exists with other user id");
         }
+
+        // checking the condition that username / password should not be updated
 
         // setting of the optional fields i.e phone, email and profile picture
         if( user.getPhoneNumber() != null) {

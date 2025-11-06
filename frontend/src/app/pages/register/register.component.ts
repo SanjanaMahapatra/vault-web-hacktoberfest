@@ -48,6 +48,8 @@ export class RegisterComponent {
         ],
         password: ['', Validators.required],
         confirmPassword: ['', Validators.required],
+        email: [''],
+        phoneNumber: ['']
       },
       { validators: this.passwordMatchValidator },
     );
@@ -69,9 +71,9 @@ export class RegisterComponent {
 
     if (this.registerForm.invalid) return;
 
-    const { username, password } = this.registerForm.value;
+    const { username, password, email, phoneNumber } = this.registerForm.value;
 
-    this.auth.register(username!, password!).subscribe({
+    this.auth.register(username!, password!, email, phoneNumber, '').subscribe({
       next: (res) => {
         console.log('Register success', res);
         this.router.navigate(['/login']);
