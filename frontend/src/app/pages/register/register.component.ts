@@ -92,7 +92,7 @@ export class RegisterComponent implements OnInit {
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        alert(err.error?.message || 'Registration failed. Try again.');
+        this.errorMessage = err.error?.message || 'Registration failed. Try again.';
       },
     });
   }
