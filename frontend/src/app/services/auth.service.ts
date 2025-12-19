@@ -19,7 +19,11 @@ export class AuthService {
     return this.http
       .post<{
         token: string;
-      }>(`${this.apiUrl}/auth/login`, { username, password }, { withCredentials: true })
+      }>(
+        `${this.apiUrl}/auth/login`,
+        { username, password },
+        { withCredentials: true },
+      )
       .pipe(
         tap((res) => {
           this.saveToken(res.token);
@@ -40,10 +44,9 @@ export class AuthService {
     return this.http.post<{ token: string }>(
       `${this.apiUrl}/auth/refresh`,
       {},
-      { withCredentials: true } 
+      { withCredentials: true },
     );
   }
-
 
   saveToken(token: string): void {
     localStorage.setItem('token', token);
@@ -68,11 +71,13 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
-    this.http.post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe({
-      error: (err) => {
-        console.error('Backend logout failed', err);
-      },
-    });
+    this.http
+      .post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .subscribe({
+        error: (err) => {
+          console.error('Backend logout failed', err);
+        },
+      });
     this.router.navigate(['/login']);
   }
 

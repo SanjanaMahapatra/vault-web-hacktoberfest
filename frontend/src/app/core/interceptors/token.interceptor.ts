@@ -1,21 +1,13 @@
-import {
-  HttpInterceptorFn,
-  HttpErrorResponse,
-} from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 
-import {
-  catchError,
-  switchMap,
-  throwError,
-} from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 let isRefreshing = false;
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-
 
   if (
     !req.url.includes('/login') &&
@@ -34,7 +26,6 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-
       // Only handle 401
       if (error.status !== 401) {
         return throwError(() => error);
