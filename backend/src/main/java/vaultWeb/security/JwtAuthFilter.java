@@ -5,9 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -31,74 +29,74 @@ import vaultWeb.services.auth.MyUserDetailsService;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
-    private final MyUserDetailsService userDetailsService;
+  private final JwtUtil jwtUtil;
+  private final MyUserDetailsService userDetailsService;
 
-    /**
-     * Constructs a new {@code JwtAuthFilter} with the specified {@link JwtUtil} and {@link
-     * MyUserDetailsService}.
-     *
-     * @param jwtUtil the utility class for JWT token operations (extracting username, validating
-     *     token)
-     * @param userDetailsService the user details service to load user information by username
-     */
-    /**
-     * Filters each HTTP request, performing JWT validation and setting authentication in the security
-     * context.
-     *
-     * <p>Steps:
-     *
-     * <ol>
-     *   <li>Skip requests starting with "/api/auth/".
-     *   <li>Extract JWT from the "Authorization" header if it starts with "Bearer ".
-     *   <li>Validate the token and extract the username.
-     *   <li>Load user details and set authentication in the {@link SecurityContextHolder}.
-     * </ol>
-     * <p>
-     * If the token is invalid or expired, a 401 Unauthorized response is returned.
-     *
-     * @param request     the incoming HTTP request
-     * @param response    the HTTP response
-     * @param filterChain the filter chain
-     * @throws ServletException if a servlet error occurs
-     * @throws IOException      if an I/O error occurs
-     */
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+  /**
+   * Constructs a new {@code JwtAuthFilter} with the specified {@link JwtUtil} and {@link
+   * MyUserDetailsService}.
+   *
+   * @param jwtUtil the utility class for JWT token operations (extracting username, validating
+   *     token)
+   * @param userDetailsService the user details service to load user information by username
+   */
+  /**
+   * Filters each HTTP request, performing JWT validation and setting authentication in the security
+   * context.
+   *
+   * <p>Steps:
+   *
+   * <ol>
+   *   <li>Skip requests starting with "/api/auth/".
+   *   <li>Extract JWT from the "Authorization" header if it starts with "Bearer ".
+   *   <li>Validate the token and extract the username.
+   *   <li>Load user details and set authentication in the {@link SecurityContextHolder}.
+   * </ol>
+   *
+   * <p>If the token is invalid or expired, a 401 Unauthorized response is returned.
+   *
+   * @param request the incoming HTTP request
+   * @param response the HTTP response
+   * @param filterChain the filter chain
+   * @throws ServletException if a servlet error occurs
+   * @throws IOException if an I/O error occurs
+   */
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-        String path = request.getServletPath();
-        if (path.startsWith("/api/auth/register") ||
-                path.startsWith("/api/auth/login") ||
-                path.startsWith("/api/auth/refresh")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        final String authHeader = request.getHeader("Authorization");
-        String username = null;
-        String jwt;
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            try {
-                username = jwtUtil.extractUsername(jwt);
-            } catch (JwtException | AuthenticationException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
-                return;
-            }
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
-
-        filterChain.doFilter(request, response);
+    String path = request.getServletPath();
+    if (path.startsWith("/api/auth/register")
+        || path.startsWith("/api/auth/login")
+        || path.startsWith("/api/auth/refresh")) {
+      filterChain.doFilter(request, response);
+      return;
     }
+
+    final String authHeader = request.getHeader("Authorization");
+    String username = null;
+    String jwt;
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      jwt = authHeader.substring(7);
+      try {
+        username = jwtUtil.extractUsername(jwt);
+      } catch (JwtException | AuthenticationException e) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+        return;
+      }
+    }
+
+    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      UsernamePasswordAuthenticationToken authToken =
+          new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+      authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    filterChain.doFilter(request, response);
+  }
 }

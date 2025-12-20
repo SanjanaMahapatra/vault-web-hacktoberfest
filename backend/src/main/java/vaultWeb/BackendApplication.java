@@ -24,18 +24,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * <p>Implements {@link WebMvcConfigurer} to allow optional customization of Spring MVC
  * configuration.
  */
-
 @EnableScheduling
 @EnableAspectJAutoProxy
 @SpringBootApplication
 public class BackendApplication implements WebMvcConfigurer {
 
-    /**
-     * Main method that serves as the entry point of the Spring Boot application.
-     *
-     * @param args Command-line arguments passed to the application.
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(BackendApplication.class, args);
-    }
+  /**
+   * Main method that serves as the entry point of the Spring Boot application.
+   *
+   * @param args Command-line arguments passed to the application.
+   */
+  public static void main(String[] args) {
+    SpringApplication.run(BackendApplication.class, args);
+  }
 }

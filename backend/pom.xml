@@ -140,7 +140,9 @@
                 <version>2.43.0</version>
                 <configuration>
                     <java>
-                        <googleJavaFormat/>
+                        <googleJavaFormat>
+                            <version>1.28.0</version>  <!-- Add this line for Java 21 compatibility -->
+                        </googleJavaFormat>
                         <includes>
                             <include>src/**/*.java</include>
                         </includes>

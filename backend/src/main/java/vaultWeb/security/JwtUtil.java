@@ -5,13 +5,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,131 +47,123 @@ import vaultWeb.models.User;
 @Component
 public class JwtUtil {
 
-    /**
-     * Secret key used for signing the JWT. Generated using HS256 (HMAC with SHA-256) algorithm.
-     */
-    private final SecretKey SECRET_KEY;
-    private final SecretKey RefreshKEY;
+  /** Secret key used for signing the JWT. Generated using HS256 (HMAC with SHA-256) algorithm. */
+  private final SecretKey SECRET_KEY;
 
-    private final long EXPIRATION_TIME = 1000 * 60 * 15;
+  private final SecretKey RefreshKEY;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret, @Value("${jwt.refreshSecret}") String refreshSecret) {
-        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
-        this.RefreshKEY = Keys.hmacShaKeyFor(refreshSecret.getBytes());
+  private final long EXPIRATION_TIME = 1000 * 60 * 15;
+
+  public JwtUtil(
+      @Value("${jwt.secret}") String secret, @Value("${jwt.refreshSecret}") String refreshSecret) {
+    this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    this.RefreshKEY = Keys.hmacShaKeyFor(refreshSecret.getBytes());
+  }
+
+  /**
+   * Generates a signed JWT token for the given user. The token is signed with the {@link
+   * #SECRET_KEY} using HS256.
+   *
+   * @param user the user entity containing username and role
+   * @return a signed JWT token string
+   */
+  public String generateToken(User user) {
+    return Jwts.builder()
+        .setSubject(user.getUsername()) // set "sub" claim
+        .setIssuedAt(new Date()) // current time as issue date
+        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // expiry time
+        .signWith(SECRET_KEY) // sign token with secret key
+        .compact(); // build token string
+  }
+
+  /**
+   * Extracts the username (subject) from the provided JWT token.
+   *
+   * <p>This method also validates the token's signature using the {@link #SECRET_KEY}. If the token
+   * is invalid or expired, parsing will throw an exception.
+   *
+   * @param token the JWT token string
+   * @return the username (subject) embedded in the token
+   * @throws io.jsonwebtoken.JwtException if token parsing or validation fails
+   */
+  public String extractUsername(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(SECRET_KEY) // set key to verify signature
+        .build()
+        .parseClaimsJws(token) // parse and validate token
+        .getBody()
+        .getSubject(); // extract "sub" claim (username)
+  }
+
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
+      return true;
+    } catch (JwtException e) {
+      return false;
     }
+  }
 
+  public Authentication getAuthentication(String token) {
+    String username = extractUsername(token);
+    return new UsernamePasswordAuthenticationToken(
+        username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+  }
 
-    /**
-     * Generates a signed JWT token for the given user. The token is signed with the {@link
-     * #SECRET_KEY} using HS256.
-     *
-     * @param user the user entity containing username and role
-     * @return a signed JWT token string
-     */
-    public String generateToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getUsername()) // set "sub" claim
-                .setIssuedAt(new Date()) // current time as issue date
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // expiry time
-                .signWith(SECRET_KEY) // sign token with secret key
-                .compact(); // build token string
-    }
+  /**
+   * Generates a signed refresh token JWT for the given user.
+   *
+   * <p>The refresh token:
+   *
+   * <ul>
+   *   <li>Uses the user's ID as the subject (<code>sub</code>).
+   *   <li>Includes a unique token identifier (<code>jti</code>) used for refresh token rotation and
+   *       revocation.
+   *   <li>Has a long expiration time.
+   *   <li>Is signed using a dedicated refresh-token signing key.
+   * </ul>
+   *
+   * @param user the authenticated user
+   * @param tokenId the unique refresh token identifier (jti)
+   * @return a signed refresh token JWT
+   */
+  public String generateRefreshToken(User user, String tokenId) {
+    Instant now = Instant.now();
+    Instant expiry = now.plus(30, ChronoUnit.DAYS);
 
-    /**
-     * Extracts the username (subject) from the provided JWT token.
-     *
-     * <p>This method also validates the token's signature using the {@link #SECRET_KEY}. If the token
-     * is invalid or expired, parsing will throw an exception.
-     *
-     * @param token the JWT token string
-     * @return the username (subject) embedded in the token
-     * @throws io.jsonwebtoken.JwtException if token parsing or validation fails
-     */
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY) // set key to verify signature
-                .build()
-                .parseClaimsJws(token) // parse and validate token
-                .getBody()
-                .getSubject(); // extract "sub" claim (username)
-    }
+    return Jwts.builder()
+        .setSubject(user.getId().toString())
+        .setId(tokenId) // jti
+        .setIssuedAt(Date.from(now))
+        .setExpiration(Date.from(expiry))
+        .signWith(RefreshKEY, SignatureAlgorithm.HS256)
+        .compact();
+  }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
+  /**
+   * Parses and validates a refresh token JWT.
+   *
+   * <p>This method verifies the refresh token's signature and expiration using the refresh-token
+   * signing key and returns its claims.
+   *
+   * @param token the refresh token JWT
+   * @return the parsed JWT claims
+   * @throws JwtException if the token is invalid or expired
+   */
+  public Claims parseRefreshToken(String token) {
+    return Jwts.parserBuilder().setSigningKey(RefreshKEY).build().parseClaimsJws(token).getBody();
+  }
 
-    public Authentication getAuthentication(String token) {
-        String username = extractUsername(token);
-        return new UsernamePasswordAuthenticationToken(
-                username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-    }
-
-
-    /**
-     * Generates a signed refresh token JWT for the given user.
-     *
-     * <p>The refresh token:
-     * <ul>
-     *   <li>Uses the user's ID as the subject (<code>sub</code>).</li>
-     *   <li>Includes a unique token identifier (<code>jti</code>) used for
-     *       refresh token rotation and revocation.</li>
-     *   <li>Has a long expiration time.</li>
-     *   <li>Is signed using a dedicated refresh-token signing key.</li>
-     * </ul>
-     *
-     * @param user the authenticated user
-     * @param tokenId the unique refresh token identifier (jti)
-     * @return a signed refresh token JWT
-     */
-    public String generateRefreshToken(User user, String tokenId) {
-        Instant now = Instant.now();
-        Instant expiry = now.plus(30, ChronoUnit.DAYS);
-
-        return Jwts.builder()
-                .setSubject(user.getId().toString())
-                .setId(tokenId) // jti
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiry))
-                .signWith(RefreshKEY, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    /**
-     * Parses and validates a refresh token JWT.
-     *
-     * <p>This method verifies the refresh token's signature and expiration
-     * using the refresh-token signing key and returns its claims.
-     *
-     * @param token the refresh token JWT
-     * @return the parsed JWT claims
-     * @throws JwtException if the token is invalid or expired
-     */
-    public Claims parseRefreshToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(RefreshKEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-
-    /**
-     * Extracts the refresh token identifier (<code>jti</code>) from a refresh token.
-     *
-     * <p>The refresh token is fully validated before extracting the identifier.
-     *
-     * @param refreshToken the refresh token JWT
-     * @return the token identifier (jti)
-     * @throws JwtException if the token is invalid or expired
-     */
-    public String extractTokenId(String refreshToken) {
-        return parseRefreshToken(refreshToken).getId();
-    }
-
-
+  /**
+   * Extracts the refresh token identifier (<code>jti</code>) from a refresh token.
+   *
+   * <p>The refresh token is fully validated before extracting the identifier.
+   *
+   * @param refreshToken the refresh token JWT
+   * @return the token identifier (jti)
+   * @throws JwtException if the token is invalid or expired
+   */
+  public String extractTokenId(String refreshToken) {
+    return parseRefreshToken(refreshToken).getId();
+  }
 }
