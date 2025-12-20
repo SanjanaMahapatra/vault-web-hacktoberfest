@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "eslint 'src/**/*.{ts,html}'",
-    "prettier:check": "prettier --check ."
+    "prettier:check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "private": true,
   "dependencies": {

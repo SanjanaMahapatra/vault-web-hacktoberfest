@@ -18,6 +18,7 @@ button {
   background-color: var(--color-background-secondary);
 }
 
+/** Message Bubbles */
 .bg-gray-200 {
   background-color: #cbd5e1 !important;
   color: #1e293b !important;
@@ -31,14 +32,14 @@ button {
 }
 
 .my-message {
-  background-color: #2563eb !important; 
+  background-color: #2563eb !important;
   color: #fff !important;
   border: 2px solid #1d4ed8;
-  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.10);
+  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.1);
 }
 
 :root.dark-theme .my-message {
-  background-color: #3b82f6 !important; 
+  background-color: #3b82f6 !important;
   color: #fff !important;
   border: 2px solid #60a5fa;
 }

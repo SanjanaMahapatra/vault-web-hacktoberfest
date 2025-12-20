@@ -27,7 +27,8 @@
         class="max-w-[75%] px-4 py-2 rounded-xl text-sm break-words"
         [ngClass]="{
           'my-message rounded-br-none': msg.senderUsername === currentUsername,
-          'bg-gray-200 text-gray-900 rounded-bl-none': msg.senderUsername !== currentUsername
+          'bg-gray-200 text-gray-900 rounded-bl-none':
+            msg.senderUsername !== currentUsername,
         }"
       >
         {{ msg.content }}
