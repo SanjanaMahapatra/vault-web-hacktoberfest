@@ -31,7 +31,7 @@ For example, file storage and file management are provided by the **Cloud Page**
 ---
 
 ## Local Development
-
+For local development and contributions, it is recommended to fork the repository first.
 Vault Web uses **Docker** for local development.
 
 ### Requirements
@@ -41,6 +41,7 @@ Vault Web uses **Docker** for local development.
 - Node.js & npm  
 
 ---
+If you plan to contribute, clone your fork instead of the main repository.
 
 ## 1. Clone the Repository
 
@@ -122,6 +123,13 @@ This project is intended for **self-hosted and home-server environments**.
 Contributions and feedback are welcome.
 
 ---
+
+## Contributing
+
+To contribute to this project, please fork the repository and create a feature branch in your fork.
+Pull requests should be opened from your forked repository to the main branch of this repository.
+
+If you are new to the project, feel free to open an issue before starting work to discuss your idea.
 
 ## Troubleshooting
 
