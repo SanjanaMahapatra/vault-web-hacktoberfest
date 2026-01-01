@@ -1,6 +1,7 @@
 package vaultWeb.controllers;
 
 import jakarta.validation.Valid;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Controller;
 import vaultWeb.dtos.ChatMessageDto;
 import vaultWeb.models.ChatMessage;
 import vaultWeb.services.ChatService;
-
-import java.util.Set;
 
 /**
  * Controller responsible for handling WebSocket-based chat functionality.
@@ -48,7 +47,7 @@ public class ChatController {
    * @param messageDto DTO containing message content, sender information, and private chat ID
    */
   @MessageMapping("/chat.private.send")
-  public void sendPrivateMessage( @Valid @Payload ChatMessageDto messageDto) {
+  public void sendPrivateMessage(@Valid @Payload ChatMessageDto messageDto) {
     ChatMessage savedMessage = chatService.saveMessage(messageDto);
 
     String decryptedContent =
@@ -66,14 +65,12 @@ public class ChatController {
     messagingTemplate.convertAndSendToUser(user1, "/queue/private", responseDto);
     Set<String> recipients = Set.of(user1, user2);
 
-    recipients.forEach(user ->
-            messagingTemplate.convertAndSendToUser(
-                    user, "/queue/private", responseDto
-            )
-    );
+    recipients.forEach(
+        user -> messagingTemplate.convertAndSendToUser(user, "/queue/private", responseDto));
 
-    log.debug("Private message sent from {} to privateChat {}",
-            responseDto.getSenderUsername(),
-            responseDto.getPrivateChatId());
+    log.debug(
+        "Private message sent from {} to privateChat {}",
+        responseDto.getSenderUsername(),
+        responseDto.getPrivateChatId());
   }
 }

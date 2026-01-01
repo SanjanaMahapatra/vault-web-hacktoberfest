@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageDto {
-  @NotBlank
-  private String content;
+  @NotBlank private String content;
   private String timestamp;
-  @NotNull
-  private Long groupId;
+  @NotNull private Long groupId;
   private Long privateChatId;
   private Long senderId;
   private String senderUsername;
