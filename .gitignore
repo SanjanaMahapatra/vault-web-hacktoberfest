@@ -60,7 +60,6 @@ ehthumbs.db
 # Sensitive configuration files
 .env
 application.yml
-application-dev.yml
 application-prod.yml
 
 # Temporary files

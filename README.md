@@ -1,6 +1,6 @@
 # Vault Web
 
-**Vault Web** is the core project of the **Vault Web ecosystem**.  
+**Vault Web** is the core project of the **Vault Web ecosystem**.
 It is a full-stack application combining a **Spring Boot backend**, an **Angular frontend**, and a **PostgreSQL** database.
 
 Vault Web acts as a **central dashboard** for a modular, self-hosted home server ecosystem. It provides a single entry point where multiple services are integrated into one secure web interface.
@@ -18,29 +18,31 @@ Vault Web is responsible for:
 
 Additional services are **not implemented directly in this repository**, but are embedded into the Vault Web frontend.
 
-For example, file storage and file management are provided by the **Cloud Page** service:  
+For example, file storage and file management are provided by the **Cloud Page** service:
 👉 https://github.com/Vault-Web/cloud-page
 
 ---
 
 ## Project Structure
 
-- 📁 [**DIRECTORY.md**](https://github.com/Vault-Web/vault-web/blob/main/DIRECTORY.md) – generated project structure overview  
-- 📚 [**Javadoc**](https://vault-web.github.io/vault-web) – backend API documentation  
+- 📁 [**DIRECTORY.md**](https://github.com/Vault-Web/vault-web/blob/main/DIRECTORY.md) – generated project structure overview
+- 📚 [**Javadoc**](https://vault-web.github.io/vault-web) – backend API documentation
 
 ---
 
 ## Local Development
+
 For local development and contributions, it is recommended to fork the repository first.
 Vault Web uses **Docker** for local development.
 
 ### Requirements
 
-- Docker & Docker Compose  
-- Java 21+ (Java 24 supported)  
-- Node.js & npm  
+- Docker & Docker Compose
+- Java 21+ (Java 24 supported)
+- Node.js & npm
 
 ---
+
 If you plan to contribute, clone your fork instead of the main repository.
 
 ## 1. Clone the Repository
@@ -69,27 +71,46 @@ You may adjust the values if needed, but make sure that:
 docker compose up -d
 ```
 
-* PostgreSQL: `localhost:<DB_PORT>`
-* pgAdmin: [http://localhost:8081](http://localhost:8081)
+- PostgreSQL: `localhost:<DB_PORT>`
+- pgAdmin: [http://localhost:8081](http://localhost:8081)
 
 ---
 
 ## 4. Backend (Spring Boot)
 
-Configuration file:
-`backend/src/main/resources/application.properties`
+The backend can run in **HTTP** or **HTTPS** mode:
 
-Ensure the database values match the `.env` file.
+### HTTP Mode (API testing only)
 
-Start the backend:
+For backend-only development and API testing without the frontend.
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-* API: [http://localhost:8080](http://localhost:8080)
-* Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- API: [http://localhost:8080](http://localhost:8080)
+- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+⚠️ **Note:** The frontend is configured to use HTTPS and will **not connect** to HTTP mode.
+
+### HTTPS Mode (full-stack development)
+
+For development with the Angular frontend, as it requires HTTPS for secure cookies and JWT authentication.
+
+**Start with HTTPS:**
+
+```bash
+cd backend
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+- API: [https://localhost:8080](https://localhost:8080)
+- Swagger UI: [https://localhost:8080/swagger-ui.html](https://localhost:8080/swagger-ui.html)
+
+⚠️ **Browser Warning:** You will see a security warning about a self-signed certificate. This is normal for local development. Accept the warning to proceed.
+
+> **Database Configuration:** Ensure the database values in `backend/src/main/resources/application.properties` match the `.env` file.
 
 ### Timezone configuration (important for some environments)
 
@@ -100,20 +121,23 @@ If you encounter an error like:
 ```text
 FATAL: invalid value for parameter "TimeZone"
 ```
+
 see [common_problems.md](./common_problems.md) for platform-specific troubleshooting and startup guidance.
 
 ---
 
 ## 5. Frontend (Angular)
 
+⚠️ **Important:** The frontend requires the backend to be running in **HTTPS mode** (see section 4).
+
 ```bash
 cd frontend
 npm install
-ng serve
+npm start
 ```
 
 Open:
-👉 [http://localhost:4200](http://localhost:4200)
+👉 [https://localhost:4200](https://localhost:4200)
 
 ---
 
